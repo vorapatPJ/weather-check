@@ -136,7 +136,7 @@
         </div>
     </div>
     <script>
-        const provinces = ["กรุงเทพมหานคร", "เชียงใหม่", "ภูเก็ต", "ขอนแก่น", "ชลบุรี"]; // ท่านผู้นำสามารถเพิ่มจังหวัดอื่น ๆ ได้
+        const provinces = ["กรุงเทพมหานคร", "เชียงใหม่", "ภูเก็ต", "ขอนแก่น", "ชลบุรี"];
 
         document.getElementById('province-input').addEventListener('input', function() {
             let input = this.value.toLowerCase();
@@ -186,7 +186,7 @@
                         setTimeout(() => {
                             analysisBox.style.display = 'none';
                             alert(`Checking weather for ${selectedProvince}`);
-                            // ท่านผู้นำสามารถเพิ่มโค้ดการเรียก API สำหรับการเช็คสภาพอากาศที่นี่
+                            
                         }, 500);
                     }
                 }, 3000);
