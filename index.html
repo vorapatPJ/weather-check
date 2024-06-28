@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Checker</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-box {
+            width: 200px;
+            height: 200px;
+            border: 2px dashed #ccc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .image-box img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .search-box {
+            position: relative;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        #province-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        #suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            z-index: 1000;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        #suggestions div {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        #suggestions div:hover {
+            background-color: #f0f0f0;
+        }
+
+        #weather-check {
+            padding: 10px 20px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #weather-check:hover {
+            background-color: #0056b3;
+        }
+
+        #analysis-box {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            border: 2px solid #ccc;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1001;
+            width: 300px;
+            text-align: center;
+        }
+
+        #progress-bar {
+            width: 100%;
+            background-color: #ccc;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        #progress-bar div {
+            height: 20px;
+            width: 0;
+            background-color: #4caf50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="image-box">
+            <img id="selected-image" src="pic1" height="100%" alt="Selected Image">
+        </div>
+        <div class="search-box">
+            <input type="text" id="province-input" placeholder="ค้นหาจังหวัด">
+            <div id="suggestions"></div>
+        </div>
+        <button id="weather-check">Weather Check</button>
+    </div>
+    <div id="analysis-box">
+        <p id="analysis-message">กำลังวิเคราะห์...</p>
+        <div id="progress-bar">
+            <div></div>
+        </div>
+    </div>
+    <script>
+        const provinces = ["กรุงเทพมหานคร", "เชียงใหม่", "ภูเก็ต", "ขอนแก่น", "ชลบุรี"]; // ท่านผู้นำสามารถเพิ่มจังหวัดอื่น ๆ ได้
+
+        document.getElementById('province-input').addEventListener('input', function() {
+            let input = this.value.toLowerCase();
+            let suggestions = provinces.filter(province => province.toLowerCase().includes(input));
+            displaySuggestions(suggestions);
+        });
+
+        function displaySuggestions(suggestions) {
+            let suggestionsBox = document.getElementById('suggestions');
+            suggestionsBox.innerHTML = '';
+            suggestions.forEach(suggestion => {
+                let div = document.createElement('div');
+                div.textContent = suggestion;
+                div.addEventListener('click', function() {
+                    document.getElementById('province-input').value = this.textContent;
+                    suggestionsBox.innerHTML = '';
+                });
+                suggestionsBox.appendChild(div);
+            });
+        }
+
+        document.getElementById('weather-check').addEventListener('click', function() {
+            let selectedProvince = document.getElementById('province-input').value;
+            if (selectedProvince) {
+                let analysisBox = document.getElementById('analysis-box');
+                let analysisMessage = document.getElementById('analysis-message');
+                let progressBar = document.getElementById('progress-bar').firstElementChild;
+
+                analysisBox.style.display = 'block';
+                analysisMessage.textContent = 'กำลังวิเคราะห์...';
+                progressBar.style.width = '0';
+
+                let steps = [
+                    { message: 'กำลังตรวจสอบข้อมูล...', width: '33%' },
+                    { message: 'กำลังประมวลผล...', width: '66%' },
+                    { message: 'ไม่รู้แค่เดินออกไปดูนอกหน้าต่างไอสัส', width: '100%' }
+                ];
+
+                let currentStep = 0;
+                let interval = setInterval(() => {
+                    if (currentStep < steps.length) {
+                        analysisMessage.textContent = steps[currentStep].message;
+                        progressBar.style.width = steps[currentStep].width;
+                        currentStep++;
+                    } else {
+                        clearInterval(interval);
+                        setTimeout(() => {
+                            analysisBox.style.display = 'none';
+                            alert(`Checking weather for ${selectedProvince}`);
+                            // ท่านผู้นำสามารถเพิ่มโค้ดการเรียก API สำหรับการเช็คสภาพอากาศที่นี่
+                        }, 500);
+                    }
+                }, 3000);
+            } else {
+                alert('กรุณาเลือกจังหวัดก่อน');
+            }
+        });
+    </script>
+</body>
+</html>
